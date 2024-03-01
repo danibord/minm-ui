@@ -13,16 +13,16 @@ interface ParamsSectionProps {
 
 export function ParamsSection({ paramsRef }: ParamsSectionProps) {
   const [initialTime, setInitialTime] = useState(0)
-  const [time, setTime] = useState(0)
-  const [step, setStep] = useState(0)
+  const [modelingTime, setModelingTime] = useState(0)
+  const [timeStep, setTimeStep] = useState(0)
   const [method, setMethod] = useState(METHOD.EXPLICIT_EULER)
 
   useImperativeHandle(paramsRef, () => ({
     getData: () => ({
       initial_time: initialTime,
-      time,
-      step,
-      method,
+      modeling_time: modelingTime,
+      time_step: timeStep,
+      ODE_method_name: method,
     }),
   }))
 
@@ -36,16 +36,16 @@ export function ParamsSection({ paramsRef }: ParamsSectionProps) {
         addonBefore="Начальное время, с:"
       />
       <InputNumber
-        value={time}
+        value={modelingTime}
         onChange={(newValue) => {
-          setTime(newValue || 0)
+          setModelingTime(newValue || 0)
         }}
         addonBefore="Время, с:"
       />
       <InputNumber
-        value={step}
+        value={timeStep}
         onChange={(newValue) => {
-          setStep(newValue || 0)
+          setTimeStep(newValue || 0)
         }}
         addonBefore="Шаг, с:"
       />
