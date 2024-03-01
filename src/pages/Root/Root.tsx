@@ -5,21 +5,31 @@ import {
   ParamsSectionRef,
 } from "../../components"
 import { Button, Card, Flex } from "antd"
-import { useRef } from "react"
-import { cardStyle } from "../../const"
+import { useRef, useState } from "react"
+import { cardStyle, urls } from "../../const"
+import axios from "axios"
 
 export function Root() {
+  const [loading, setLoading] = useState(false)
   const tableRef = useRef<TableSectionRef>(null)
   const paramsRef = useRef<ParamsSectionRef>(null)
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!tableRef.current || !paramsRef.current) {
       return
     }
 
     const tables = tableRef.current.getData()
     const params = paramsRef.current.getData()
-    console.log({ tables, params })
+    const data = { ...tables, ...params }
+
+    setLoading(true)
+    try {
+      const result = await axios.post(urls.solveKinetics, data)
+      console.log({ data, result })
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -33,7 +43,9 @@ export function Root() {
       >
         <Flex vertical gap={16}>
           <ParamsSection paramsRef={paramsRef} />
-          <Button onClick={onSubmit}>Решить</Button>
+          <Button onClick={onSubmit} loading={loading}>
+            Решить
+          </Button>
         </Flex>
       </Card>
       <Flex vertical gap={16} style={{ width: "70%" }}>
