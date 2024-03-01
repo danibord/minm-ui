@@ -6,7 +6,7 @@ import {
 } from "../../components"
 import { Button, Card, Flex } from "antd"
 import { useRef, useState } from "react"
-import { cardStyle, urls } from "../../const"
+import { MOCK_DATA, cardStyle, urls } from "../../const"
 import axios from "axios"
 
 export function Root() {
@@ -21,7 +21,7 @@ export function Root() {
 
     const tables = tableRef.current.getData()
     const params = paramsRef.current.getData()
-    const data = { ...tables, ...params }
+    const data = MOCK_DATA || { ...tables, ...params }
 
     setLoading(true)
     try {
