@@ -26,7 +26,7 @@ export function Root() {
     setLoading(true)
     try {
       const result = await axios.post(urls.solveKinetics, data)
-      console.log({ data, result })
+      console.log({ data, result: JSON.parse(result.data) })
     } finally {
       setLoading(false)
     }
