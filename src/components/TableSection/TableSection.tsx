@@ -48,11 +48,11 @@ export function TableSection({ tableRef }: TableSectionProps) {
 
   // Update stehiometric and exponents (depends on stages and components + time column)
   useEffect(() => {
-    const newMatrix = getZeroMatrix(stages, components + 1)
+    const newMatrix = getZeroMatrix(experiments, components + 1)
     setExperimentalMatrix((currentMatrix) =>
       mergeMatrix(currentMatrix, newMatrix),
     )
-  }, [components, stages])
+  }, [components, experiments])
 
   // Update speedMatrix (depends on stages only)
   useEffect(() => {

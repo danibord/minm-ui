@@ -18,7 +18,7 @@ export function getStehiometricColumns(
     ...Array.from({ length: components }).map((_, columnIndex) => ({
       key: columnIndex,
       dataIndex: ["components", columnIndex],
-      title: `C${columnIndex}`,
+      title: `C${columnIndex + 1}`,
       render: (cellValue: number, _: RowData, rowIndex: number) => (
         <InputNumber
           value={cellValue || 0}
