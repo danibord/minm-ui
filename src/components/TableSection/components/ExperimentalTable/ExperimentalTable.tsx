@@ -27,7 +27,7 @@ export const ExperimentalTable = memo(
           <Table
             dataSource={rows}
             columns={columns}
-            rowKey={(_, index) => index || 0}
+            rowKey={(row) => row.id}
             pagination={false}
             bordered
           />
