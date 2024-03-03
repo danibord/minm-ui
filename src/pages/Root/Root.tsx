@@ -42,7 +42,6 @@ export function Root() {
         <Card
           style={{
             ...cardStyle,
-            // width: "calc(30% - 8px)",
             maxWidth: 500,
             flexGrow: 1,
             height: "fit-content",
