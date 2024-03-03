@@ -2,7 +2,7 @@ import { Card, Table } from "antd"
 import { getStehiometricColumns, matrixToRows } from "./utils"
 import { memo, useMemo } from "react"
 import { useUpdateCellHandler } from "../../../../hooks/useUpdateCellHandler"
-import { cardStyle } from "../../../../const"
+import { cardStyle, tableStyle } from "../../../../const"
 
 interface StehiometricTableProps {
   components: number
@@ -22,7 +22,10 @@ export const StehiometricTable = memo(
     const rows = matrixToRows(value)
 
     return (
-      <Card title="Матрица стехиометрических коэффициентов" style={cardStyle}>
+      <Card
+        title="Матрица стехиометрических коэффициентов"
+        style={{ ...cardStyle, ...tableStyle }}
+      >
         <div style={{ overflow: "auto", height: 400 }}>
           <Table
             dataSource={rows}

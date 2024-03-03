@@ -2,6 +2,13 @@ export const cardStyle = {
   boxShadow: "1px 1px 10px",
 }
 
+export const tableStyle = {
+  minWidth: "calc(50% - 8px)",
+  maxWidth: "calc(50% - 8px)",
+  // flexBasis: "50%",
+  flex: 1,
+}
+
 const rootUrl = "http://localhost:8000/api/v1"
 
 export const urls = {

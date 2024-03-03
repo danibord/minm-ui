@@ -2,7 +2,7 @@ import { Card, Table } from "antd"
 import { getExperimentalColumns, matrixToRows } from "./utils"
 import { memo, useMemo } from "react"
 import { useUpdateCellHandler } from "../../../../hooks/useUpdateCellHandler"
-import { cardStyle } from "../../../../const"
+import { cardStyle, tableStyle } from "../../../../const"
 
 interface ExperimentalTableProps {
   components: number
@@ -22,7 +22,10 @@ export const ExperimentalTable = memo(
     const rows = matrixToRows(value)
 
     return (
-      <Card title="Экспериментальные данные" style={cardStyle}>
+      <Card
+        title="Экспериментальные данные"
+        style={{ ...cardStyle, ...tableStyle }}
+      >
         <div style={{ overflow: "auto", height: 400 }}>
           <Table
             dataSource={rows}

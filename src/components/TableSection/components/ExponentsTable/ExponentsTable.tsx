@@ -2,7 +2,7 @@ import { Card, Table } from "antd"
 import { getExponentsColumns, matrixToRows } from "./utils"
 import { memo, useMemo } from "react"
 import { useUpdateCellHandler } from "../../../../hooks/useUpdateCellHandler"
-import { cardStyle } from "../../../../const"
+import { cardStyle, tableStyle } from "../../../../const"
 
 interface ExponentsTableProps {
   components: number
@@ -22,7 +22,10 @@ export const ExponentsTable = memo(
     const rows = matrixToRows(value)
 
     return (
-      <Card title="Матрица показателей степени" style={cardStyle}>
+      <Card
+        title="Матрица показателей степени"
+        style={{ ...cardStyle, ...tableStyle }}
+      >
         <div style={{ overflow: "auto", height: 400 }}>
           <Table
             dataSource={rows}

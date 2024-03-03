@@ -33,24 +33,29 @@ export function Root() {
   }
 
   return (
-    <Flex gap={16} style={{ padding: 16 }}>
-      <Card
-        style={{
-          ...cardStyle,
-          width: "30%",
-          height: "fit-content",
-        }}
-      >
-        <Flex vertical gap={16}>
-          <ParamsSection paramsRef={paramsRef} />
-          <Button onClick={onSubmit} loading={loading}>
-            Решить
-          </Button>
-        </Flex>
-      </Card>
-      <Flex vertical gap={16} style={{ width: "70%" }}>
+    <Card
+      title="Моделирование в микрореакторах"
+      style={{ ...cardStyle, margin: 16 }}
+    >
+      <Flex vertical gap={16} style={{ padding: 16 }}>
         <TableSection tableRef={tableRef} />
+        <Card
+          style={{
+            ...cardStyle,
+            // width: "calc(30% - 8px)",
+            maxWidth: 500,
+            flexGrow: 1,
+            height: "fit-content",
+          }}
+        >
+          <Flex vertical gap={16}>
+            <ParamsSection paramsRef={paramsRef} />
+            <Button onClick={onSubmit} loading={loading}>
+              Решить
+            </Button>
+          </Flex>
+        </Card>
       </Flex>
-    </Flex>
+    </Card>
   )
 }

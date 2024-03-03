@@ -62,7 +62,10 @@ export function TableSection({ tableRef }: TableSectionProps) {
 
   return (
     <>
-      <Card title="Параметры таблиц" style={cardStyle}>
+      <Card
+        title="Параметры таблиц"
+        style={{ ...cardStyle, width: "fit-content" }}
+      >
         <Flex vertical gap={8} style={{ maxWidth: 300 }}>
           <InputNumber
             value={components}
@@ -84,22 +87,24 @@ export function TableSection({ tableRef }: TableSectionProps) {
           />
         </Flex>
       </Card>
-      <StehiometricTable
-        components={components}
-        value={stehiometricMatrix}
-        onChange={setStehiometricMatrix}
-      />
-      <ExponentsTable
-        components={components}
-        value={exponentsMatrix}
-        onChange={setExponentsMatrix}
-      />
-      <ExperimentalTable
-        components={components}
-        value={experimentalMatrix}
-        onChange={setExperimentalMatrix}
-      />
-      <SpeedTable value={speedMatrix} onChange={setSpeedMatrix} />
+      <Flex gap={16} wrap="wrap">
+        <StehiometricTable
+          components={components}
+          value={stehiometricMatrix}
+          onChange={setStehiometricMatrix}
+        />
+        <ExponentsTable
+          components={components}
+          value={exponentsMatrix}
+          onChange={setExponentsMatrix}
+        />
+        <ExperimentalTable
+          components={components}
+          value={experimentalMatrix}
+          onChange={setExperimentalMatrix}
+        />
+        <SpeedTable value={speedMatrix} onChange={setSpeedMatrix} />
+      </Flex>
     </>
   )
 }
