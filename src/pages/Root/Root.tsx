@@ -36,6 +36,7 @@ export function Root() {
   }
 
   const [result, setResult] = useState<CalculationResult>()
+  const [experimentalData, setExperimentslData] = useState<number[][]>()
 
   const onSubmit = async (requestData: RequestData) => {
     setLoading(true)
@@ -45,6 +46,7 @@ export function Root() {
         requestData,
       )
       setResult(data)
+      setExperimentslData(requestData.experimental_data_matrix)
     } finally {
       setLoading(false)
     }
@@ -95,7 +97,9 @@ export function Root() {
             Решить c заготовленными данными
           </Button>
         </Flex>
-        {!!result && <ResultSection value={result} />}
+        {!!result && (
+          <ResultSection value={result} experimentalData={experimentalData!} />
+        )}
       </Flex>
     </Card>
   )
