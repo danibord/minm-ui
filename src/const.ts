@@ -1,12 +1,9 @@
+import { METHOD } from "./types"
+
+export const commonGap = 16
+
 export const cardStyle = {
   boxShadow: "1px 1px 10px",
-}
-
-export const tableStyle = {
-  minWidth: "calc(50% - 8px)",
-  maxWidth: "calc(50% - 8px)",
-  // flexBasis: "50%",
-  flex: 1,
 }
 
 const rootUrl = "http://localhost:8000/api/v1"
@@ -57,5 +54,5 @@ export const MOCK_DATA = {
   initial_time: 0,
   modeling_time: 60,
   time_step: 0.1,
-  ODE_method_name: "EXPLICIT_EULER",
+  ODE_method_name: METHOD.EXPLICIT_EULER,
 }

@@ -1,7 +1,8 @@
-import { InputNumber, Select } from "antd"
+import { Card, Flex, InputNumber, Select } from "antd"
 import { METHOD, ParamsData } from "../../types"
 import { useImperativeHandle, useState } from "react"
 import { methodOptions } from "./utils"
+import { cardStyle } from "../../const"
 
 export interface ParamsSectionRef {
   getData: () => ParamsData
@@ -27,36 +28,45 @@ export function ParamsSection({ paramsRef }: ParamsSectionProps) {
   }))
 
   return (
-    <>
-      <InputNumber
-        value={initialTime}
-        onChange={(newValue) => {
-          setInitialTime(newValue || 0)
-        }}
-        addonBefore="Начальное время, с:"
-      />
-      <InputNumber
-        value={modelingTime}
-        onChange={(newValue) => {
-          setModelingTime(newValue || 0)
-        }}
-        addonBefore="Время, с:"
-      />
-      <InputNumber
-        value={timeStep}
-        onChange={(newValue) => {
-          setTimeStep(newValue || 0)
-        }}
-        addonBefore="Шаг, с:"
-      />
-      <Select
-        value={method}
-        onChange={(value) => {
-          setMethod(value)
-        }}
-        options={methodOptions}
-        showSearch
-      />
-    </>
+    <Card
+      title="Общие параметры"
+      style={{
+        ...cardStyle,
+        maxWidth: 500,
+        height: "fit-content",
+      }}
+    >
+      <Flex vertical gap={16}>
+        <InputNumber
+          value={initialTime}
+          onChange={(newValue) => {
+            setInitialTime(newValue || 0)
+          }}
+          addonBefore="Начальное время, с:"
+        />
+        <InputNumber
+          value={modelingTime}
+          onChange={(newValue) => {
+            setModelingTime(newValue || 0)
+          }}
+          addonBefore="Время, с:"
+        />
+        <InputNumber
+          value={timeStep}
+          onChange={(newValue) => {
+            setTimeStep(newValue || 0)
+          }}
+          addonBefore="Шаг, с:"
+        />
+        <Select
+          value={method}
+          onChange={(value) => {
+            setMethod(value)
+          }}
+          options={methodOptions}
+          showSearch
+        />
+      </Flex>
+    </Card>
   )
 }

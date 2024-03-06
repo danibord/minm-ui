@@ -1,3 +1,9 @@
+export interface TableParams {
+  components: number
+  stages: number
+  experiments: number
+}
+
 export interface TableSectionData {
   stoichiometric_coefficients_matrix: number[][]
   exponents_of_substances_matrix: number[][]
@@ -26,4 +32,18 @@ export interface ParamsData {
   modeling_time: number
   time_step: number
   ODE_method_name: METHOD
+}
+
+export enum MODULE {
+  NONE = "none",
+}
+
+export type RequestData = TableSectionData & ParamsData
+
+export interface CalculationResult {
+  calculation_time: number
+  kinetics_ODE_solution: number[][]
+  numerical_errors_at_experimental_points: number[][]
+  numerical_solutions_at_experimental_points: number[][]
+  time_array: number[]
 }

@@ -1,4 +1,4 @@
-import { Card, Flex, InputNumber } from "antd"
+import { Flex } from "antd"
 import { useEffect, useImperativeHandle, useState } from "react"
 import { getZeroMatrix, mergeMatrix } from "./utils"
 import {
@@ -7,22 +7,22 @@ import {
   ExperimentalTable,
   SpeedTable,
 } from "./components"
-import { TableSectionData } from "../../types"
-import { cardStyle } from "../../const"
+import { TableParams, TableSectionData } from "../../types"
 
 export interface TableSectionRef {
   getData: () => TableSectionData
 }
 
-interface TableSectionProps {
+interface TableSectionProps extends TableParams {
   tableRef: React.Ref<TableSectionRef>
 }
 
-export function TableSection({ tableRef }: TableSectionProps) {
-  const [components, setComponents] = useState(5)
-  const [stages, setStages] = useState(5)
-  const [experiments, setExperiments] = useState(5)
-
+export function TableSection({
+  components,
+  stages,
+  experiments,
+  tableRef,
+}: TableSectionProps) {
   const [stehiometricMatrix, setStehiometricMatrix] = useState<number[][]>([[]])
   const [exponentsMatrix, setExponentsMatrix] = useState<number[][]>([])
   const [experimentalMatrix, setExperimentalMatrix] = useState<number[][]>([])
@@ -62,32 +62,7 @@ export function TableSection({ tableRef }: TableSectionProps) {
 
   return (
     <>
-      <Card
-        title="Параметры таблиц"
-        style={{ ...cardStyle, width: "fit-content" }}
-      >
-        <Flex vertical gap={8} style={{ maxWidth: 300 }}>
-          <InputNumber
-            value={components}
-            onChange={(value) => setComponents(Math.floor(value || 0))}
-            min={1}
-            addonBefore="Количество компонентов:"
-          />
-          <InputNumber
-            value={stages}
-            onChange={(value) => setStages(value || 0)}
-            min={1}
-            addonBefore="Количество стадий:"
-          />
-          <InputNumber
-            value={experiments}
-            onChange={(value) => setExperiments(value || 0)}
-            min={1}
-            addonBefore="Количество экспериментов:"
-          />
-        </Flex>
-      </Card>
-      <Flex gap={16} wrap="wrap">
+      <Flex style={{ maxWidth: "100%" }}>
         <StehiometricTable
           components={components}
           value={stehiometricMatrix}
@@ -98,13 +73,13 @@ export function TableSection({ tableRef }: TableSectionProps) {
           value={exponentsMatrix}
           onChange={setExponentsMatrix}
         />
-        <ExperimentalTable
-          components={components}
-          value={experimentalMatrix}
-          onChange={setExperimentalMatrix}
-        />
         <SpeedTable value={speedMatrix} onChange={setSpeedMatrix} />
       </Flex>
+      <ExperimentalTable
+        components={components}
+        value={experimentalMatrix}
+        onChange={setExperimentalMatrix}
+      />
     </>
   )
 }
