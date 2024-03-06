@@ -86,6 +86,8 @@ export const ResultSection = memo(
               y: "value",
               color: "component",
             },
+            axis: { y: false },
+            slider: { y: false },
           },
           {
             type: "point",
@@ -95,6 +97,8 @@ export const ResultSection = memo(
               y: "value",
               color: "component",
             },
+            axis: { y: false },
+            slider: { y: false },
           },
         ],
         axis: {
