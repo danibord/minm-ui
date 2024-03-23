@@ -1,72 +1,74 @@
-import { Card, Flex, InputNumber, Select } from "antd"
-import { METHOD, ParamsData } from "../../types"
-import { useImperativeHandle, useState } from "react"
+import { METHOD, CommonParams } from "../../types"
 import { methodOptions } from "./utils"
-import { cardStyle } from "../../const"
-
-export interface ParamsSectionRef {
-  getData: () => ParamsData
-}
+import {
+  Divider,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material"
 
 interface ParamsSectionProps {
-  paramsRef: React.Ref<ParamsSectionRef>
+  value: CommonParams
+  onChange: (value: Partial<CommonParams>) => void
 }
 
-export function ParamsSection({ paramsRef }: ParamsSectionProps) {
-  const [initialTime, setInitialTime] = useState(0)
-  const [modelingTime, setModelingTime] = useState(0)
-  const [timeStep, setTimeStep] = useState(0)
-  const [method, setMethod] = useState(METHOD.EXPLICIT_EULER)
-
-  useImperativeHandle(paramsRef, () => ({
-    getData: () => ({
-      initial_time: initialTime,
-      modeling_time: modelingTime,
-      time_step: timeStep,
-      ODE_method_name: method,
-    }),
-  }))
-
+export function ParamsSection({ value, onChange }: ParamsSectionProps) {
   return (
-    <Card
-      title="Общие параметры"
-      style={{
-        ...cardStyle,
-        maxWidth: 500,
-        height: "fit-content",
-      }}
-    >
-      <Flex vertical gap={16}>
-        <InputNumber
-          value={initialTime}
-          onChange={(newValue) => {
-            setInitialTime(newValue || 0)
+    <Paper variant="outlined">
+      <Stack p={2} gap={2}>
+        <Typography fontWeight={700}>Общие параметры</Typography>
+        <Divider />
+        <TextField
+          value={value.initial_time}
+          type="number"
+          onChange={(event) => {
+            const newValue = event.target.value
+            onChange({ initial_time: Number(newValue) })
           }}
-          addonBefore="Начальное время, с:"
+          label="Начальное время, с:"
         />
-        <InputNumber
-          value={modelingTime}
-          onChange={(newValue) => {
-            setModelingTime(newValue || 0)
+        <TextField
+          value={value.modeling_time}
+          type="number"
+          onChange={(event) => {
+            const newValue = event.target.value
+            onChange({ modeling_time: Number(newValue) })
           }}
-          addonBefore="Время, с:"
+          label="Время, с:"
         />
-        <InputNumber
-          value={timeStep}
-          onChange={(newValue) => {
-            setTimeStep(newValue || 0)
+        <TextField
+          value={value.time_step}
+          type="number"
+          onChange={(event) => {
+            const newValue = event.target.value
+            onChange({ time_step: Number(newValue) })
           }}
-          addonBefore="Шаг, с:"
+          label="Шаг, с:"
         />
-        <Select
-          value={method}
-          onChange={(value) => {
-            setMethod(value)
-          }}
-          options={methodOptions}
-          showSearch
-        />
-      </Flex>
-    </Card>
+        <FormControl>
+          <InputLabel id="method-label">Метод</InputLabel>
+          <Select
+            labelId="method-label"
+            value={value.ODE_method_name}
+            onChange={(event) => {
+              const newValue = event.target.value as METHOD
+              onChange({ ODE_method_name: newValue })
+            }}
+            label="Метод"
+          >
+            {methodOptions.map(({ value, label }) => (
+              <MenuItem key={value} value={value}>
+                {label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Stack>
+    </Paper>
   )
 }

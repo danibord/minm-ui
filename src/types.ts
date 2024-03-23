@@ -27,7 +27,7 @@ export enum METHOD {
   EXPLICIT_2STEP_ADAMS = "EXPLICIT_2STEP_ADAMS",
 }
 
-export interface ParamsData {
+export interface CommonParams {
   initial_time: number
   modeling_time: number
   time_step: number
@@ -38,7 +38,7 @@ export enum MODULE {
   NONE = "none",
 }
 
-export type RequestData = TableSectionData & ParamsData
+export type RequestData = TableSectionData & CommonParams
 
 export interface CalculationResult {
   calculation_time: number

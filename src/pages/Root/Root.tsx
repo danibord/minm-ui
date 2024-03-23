@@ -1,27 +1,37 @@
 import {
-  TableSection,
-  TableSectionRef,
   ParamsSection,
-  ParamsSectionRef,
   ModuleSection,
   TableParamsSection,
   ResultSection,
+  Table,
 } from "../../components"
-import { Button, Card, Flex } from "antd"
-import { useRef, useState } from "react"
-import { MOCK_DATA, cardStyle, urls } from "../../const"
+import { useState } from "react"
+import { MOCK_DATA, urls } from "../../const"
 import axios from "axios"
 import {
   CalculationResult,
   MODULE,
+  CommonParams,
   RequestData,
   TableParams,
+  METHOD,
 } from "../../types"
+import {
+  Box,
+  Button,
+  Divider,
+  Grid,
+  Paper,
+  Stack,
+  Typography,
+} from "@mui/material"
+import { useStoichiometricMatrix } from "../../hooks"
+import { useExponentsMatrix } from "../../hooks/useExponentsMatrix"
+import { useSpeedMatrix } from "../../hooks/useSpeedMatrix"
+import { useExperimentalMatrix } from "../../hooks/useExperimentalMatrix"
 
 export function Root() {
   const [loading, setLoading] = useState(false)
-  const tableRef = useRef<TableSectionRef>(null)
-  const paramsRef = useRef<ParamsSectionRef>(null)
 
   const [module, setModule] = useState<MODULE>(MODULE.NONE)
   const [moduleData, setModuleData] = useState<unknown>()
@@ -35,8 +45,41 @@ export function Root() {
     setTableParams((currentParams) => ({ ...currentParams, ...newParams }))
   }
 
+  const [commonParams, setCommonParams] = useState<CommonParams>({
+    initial_time: 0,
+    modeling_time: 0,
+    time_step: 0,
+    ODE_method_name: METHOD.EXPLICIT_EULER,
+  })
+  const handleCommonParamsChange = (newParams: Partial<CommonParams>) => {
+    setCommonParams((currentParams) => ({ ...currentParams, ...newParams }))
+  }
+
+  const {
+    value: stoichiometric_coefficients_matrix,
+    tableData: stoichiometricData,
+    columns: stoichiometricColumns,
+  } = useStoichiometricMatrix(tableParams.stages, tableParams.components)
+  const {
+    value: exponents_of_substances_matrix,
+    tableData: exponentsData,
+    columns: exponentsColumns,
+  } = useExponentsMatrix(tableParams.stages, tableParams.components)
+  const {
+    value: reaction_rate_constants,
+    tableData: speedData,
+    columns: speedColumns,
+  } = useSpeedMatrix(tableParams.stages)
+  const {
+    value: experimental_data_matrix,
+    tableData: experimentalTableData,
+    columns: experimentalColumns,
+  } = useExperimentalMatrix(tableParams.stages, tableParams.components + 1)
+
   const [result, setResult] = useState<CalculationResult>()
-  const [experimentalData, setExperimentslData] = useState<number[][]>()
+  const [fixedExperimentalData, setFixedExperimentalData] = useState<
+    number[][]
+  >([])
 
   const onSubmit = async (requestData: RequestData) => {
     setLoading(true)
@@ -46,61 +89,114 @@ export function Root() {
         requestData,
       )
       setResult(data)
-      setExperimentslData(requestData.experimental_data_matrix)
+      setFixedExperimentalData(requestData.experimental_data_matrix)
     } finally {
       setLoading(false)
     }
   }
 
-  console.log({ result })
-
   return (
-    <Card
-      title="Моделирование в микрореакторах"
-      style={{ ...cardStyle, margin: 16 }}
-    >
-      <Flex vertical gap={16} style={{ padding: 16 }}>
-        <Flex gap={16}>
-          <ParamsSection paramsRef={paramsRef} />
-          <ModuleSection
-            module={module}
-            onModuleChange={setModule}
-            moduleData={moduleData}
-            onModuleDataChange={setModuleData}
-          />
-          <TableParamsSection
-            value={tableParams}
-            onChange={handleTableParamsChange}
-          />
-        </Flex>
-        <TableSection {...tableParams} tableRef={tableRef} />
-        <Flex gap={8}>
-          <Button
-            onClick={() => {
-              if (!tableRef.current || !paramsRef.current) {
-                return
-              }
-              const tables = tableRef.current.getData()
-              const params = paramsRef.current.getData()
-              onSubmit({ ...tables, ...params })
-            }}
-            loading={loading}
-            style={{ flex: 1 }}
-          >
-            Решить
-          </Button>
-          <Button
-            onClick={() => onSubmit(MOCK_DATA)}
-            loading={loading}
-            style={{ flex: 1 }}
-          >
-            Решить c заготовленными данными
-          </Button>
-        </Flex>
-        {!!result && (
-          <ResultSection value={result} experimentalData={experimentalData!} />
-        )}
-      </Flex>
-    </Card>
+    <Box p={2}>
+      <Paper variant="outlined">
+        <Stack gap={2} p={2}>
+          <Typography>Моделирование в микрореакторах</Typography>
+          <Divider />
+          <Grid container spacing={2}>
+            <Grid item xs={4}>
+              <ParamsSection
+                value={commonParams}
+                onChange={handleCommonParamsChange}
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <ModuleSection
+                module={module}
+                onModuleChange={setModule}
+                moduleData={moduleData}
+                onModuleDataChange={setModuleData}
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <TableParamsSection
+                value={tableParams}
+                onChange={handleTableParamsChange}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <Table
+                label="Матрица стехиометрических коэффициентов"
+                data={stoichiometricData}
+                // Here is some TypeScript bug
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                columns={stoichiometricColumns as any}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <Table
+                label="Матрица показателей степени"
+                data={exponentsData}
+                // Here is some TypeScript bug
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                columns={exponentsColumns as any}
+              />
+            </Grid>
+            <Grid item xs={3}>
+              <Table
+                label="Константы скорости"
+                data={speedData}
+                // Here is some TypeScript bug
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                columns={speedColumns as any}
+              />
+            </Grid>
+            <Grid item xs={9}>
+              <Table
+                label="Экспериментальные данные"
+                data={experimentalTableData}
+                // Here is some TypeScript bug
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                columns={experimentalColumns as any}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <Button
+                size="large"
+                fullWidth
+                variant="outlined"
+                onClick={() => {
+                  onSubmit({
+                    ...commonParams,
+                    stoichiometric_coefficients_matrix,
+                    exponents_of_substances_matrix,
+                    reaction_rate_constants,
+                    experimental_data_matrix,
+                  })
+                }}
+                disabled={loading}
+              >
+                Решить
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Button
+                size="large"
+                fullWidth
+                variant="outlined"
+                onClick={() => onSubmit(MOCK_DATA)}
+                disabled={loading}
+              >
+                Решить c заготовленными данными
+              </Button>
+            </Grid>
+            {!!result && (
+              <ResultSection
+                value={result}
+                experimentalData={fixedExperimentalData}
+              />
+            )}
+          </Grid>
+        </Stack>
+      </Paper>
+    </Box>
   )
 }

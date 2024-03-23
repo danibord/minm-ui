@@ -1,6 +1,5 @@
-import { Card, Flex, InputNumber } from "antd"
-import { cardStyle } from "../../const"
 import { TableParams } from "../../types"
+import { Divider, Paper, Stack, TextField, Typography } from "@mui/material"
 
 interface ParamsSectionProps {
   value: TableParams
@@ -12,36 +11,38 @@ export function TableParamsSection({
   onChange,
 }: ParamsSectionProps) {
   return (
-    <Card
-      title="Параметры таблиц"
-      style={{ ...cardStyle, width: "fit-content" }}
-    >
-      <Flex vertical gap={8} style={{ maxWidth: 300 }}>
-        <InputNumber
+    <Paper variant="outlined">
+      <Stack p={2} gap={2}>
+        <Typography fontWeight={700}>Параметры таблиц</Typography>
+        <Divider />
+        <TextField
           value={components}
-          onChange={(value) => {
-            onChange({ components: value || 0 })
+          type="number"
+          onChange={(event) => {
+            const newValue = event.target.value
+            onChange({ components: Number(newValue) })
           }}
-          min={1}
-          addonBefore="Количество компонентов:"
+          label="Количество компонентов:"
         />
-        <InputNumber
+        <TextField
           value={stages}
-          onChange={(value) => {
-            onChange({ stages: value || 0 })
+          type="number"
+          onChange={(event) => {
+            const newValue = event.target.value
+            onChange({ stages: Number(newValue) })
           }}
-          min={1}
-          addonBefore="Количество стадий:"
+          label="Количество стадий:"
         />
-        <InputNumber
+        <TextField
           value={experiments}
-          onChange={(value) => {
-            onChange({ experiments: value || 0 })
+          type="number"
+          onChange={(event) => {
+            const newValue = event.target.value
+            onChange({ experiments: Number(newValue) })
           }}
-          min={1}
-          addonBefore="Количество экспериментов:"
+          label="Количество экспериментов:"
         />
-      </Flex>
-    </Card>
+      </Stack>
+    </Paper>
   )
 }

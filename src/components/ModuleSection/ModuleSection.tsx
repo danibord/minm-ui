@@ -1,35 +1,46 @@
-import { Card, Flex, Select } from "antd"
-import { cardStyle } from "../../const"
 import { MODULE } from "../../types"
 import { moduleOptions } from "./const"
+import {
+  Divider,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Stack,
+} from "@mui/material"
 
-interface ModuleSectionProps<Module extends MODULE> {
-  module: Module
-  onModuleChange: (newModule: Module) => void
+interface ModuleSectionProps {
+  module: MODULE
+  onModuleChange: (newModule: MODULE) => void
   moduleData: unknown
   onModuleDataChange: (newData: unknown) => void
 }
 
-export function ModuleSection<Module extends MODULE>({
-  module,
-  onModuleChange,
-}: ModuleSectionProps<Module>) {
+export function ModuleSection({ module, onModuleChange }: ModuleSectionProps) {
   return (
-    <Card
-      title="Расчетный модуль"
-      style={{
-        ...cardStyle,
-        maxWidth: 500,
-        flexGrow: 1,
-      }}
-    >
-      <Flex vertical gap={16}>
-        <Select
-          options={moduleOptions}
-          value={module}
-          onChange={onModuleChange}
-        />
-      </Flex>
-    </Card>
+    <Paper variant="outlined">
+      <Stack p={2} gap={2} height="100%">
+        <FormControl>
+          <InputLabel id="module-label">Расчетный модуль</InputLabel>
+          <Select
+            labelId="module-label"
+            value={module}
+            onChange={(event) => {
+              const newValue = event.target.value as MODULE
+              onModuleChange(newValue)
+            }}
+            label="Расчетный модуль"
+          >
+            {moduleOptions.map(({ value, label }) => (
+              <MenuItem key={value} value={value}>
+                {label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <Divider />
+      </Stack>
+    </Paper>
   )
 }
