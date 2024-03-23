@@ -1,122 +1,254 @@
-import { memo, useMemo } from "react"
+import { memo, useMemo, useState } from "react"
 import { CalculationResult } from "../../types"
-import { Card } from "antd"
-import { cardStyle } from "../../const"
-import { Mix, MixConfig } from "@ant-design/plots"
+import {
+  ChartsLegend,
+  ChartsTooltip,
+  ChartsXAxis,
+  ChartsYAxis,
+  LinePlot,
+  LineSeriesType,
+  ResponsiveChartContainer,
+  ScatterPlot,
+  ScatterSeriesType,
+} from "@mui/x-charts"
+import {
+  Checkbox,
+  Divider,
+  FormControlLabel,
+  FormGroup,
+  Paper,
+  Slider,
+  Stack,
+  Typography,
+} from "@mui/material"
+import { cheerfulFiestaPaletteLight } from "@mui/x-charts/colorPalettes"
 
 interface ResultSectionProps {
   value: CalculationResult
   experimentalData: number[][]
 }
 
-interface ChartData {
-  time: number
-  value: number
-  component: string
-}
+const CONTAINER_HEIGHT = 600
 
 export const ResultSection = memo(
   ({ value, experimentalData }: ResultSectionProps) => {
-    const lineData = useMemo(() => {
-      const result: ChartData[] = []
+    const maxX = value.kinetics_ODE_solution.length
 
-      value.kinetics_ODE_solution.forEach((values, timeIndex) => {
-        const time = value.time_array[timeIndex]
-        values.forEach((value, index) => {
-          result.push({ time, value, component: `Component ${index + 1}` })
+    const [xAxis, setXAxis] = useState<number[]>([0, maxX])
+    const xAxisData = value.time_array.slice(xAxis[0], xAxis[1])
+
+    const components = useMemo(
+      () =>
+        value.numerical_errors_at_experimental_points[0]
+          .slice(1)
+          .map((_, index) => ({
+            label: `Component ${index + 1}`,
+            color: cheerfulFiestaPaletteLight[index],
+          })),
+      [value],
+    )
+
+    const [componentsVisibility, setComponentsVisibility] = useState(() =>
+      Array(components.length).fill(true),
+    )
+
+    const lines = useMemo(() => {
+      const result: number[][] = []
+
+      value.kinetics_ODE_solution
+        .slice(xAxis[0], xAxis[1])
+        .forEach((values, timePoint) => {
+          values.forEach((value, index) => {
+            if (timePoint === 0) {
+              result.push([])
+            }
+            result[index].push(value)
+          })
         })
-      })
 
       return result
-    }, [value])
+    }, [value, xAxis])
 
-    const calculatedData = useMemo(() => {
-      const result: ChartData[] = []
+    const calculatedPoints = useMemo(() => {
+      const result: { x: number; y: number; id: string }[][] = []
 
       value.numerical_solutions_at_experimental_points.forEach(
-        ([time, ...values]) => {
+        ([time, ...values], timePoint) => {
           values.forEach((value, index) => {
-            result.push({
-              time,
-              value,
-              component: `Component ${index + 1}`,
-            })
+            if (timePoint === 0) {
+              result.push([])
+            }
+            if (
+              time >= xAxisData[xAxis[0]] &&
+              time <= xAxisData[xAxis[1] - 1]
+            ) {
+              result[index].push({
+                x: time,
+                y: value,
+                id: `Calculated ${index + 1} (${time}, ${value})`,
+              })
+            }
           })
         },
       )
 
       return result
-    }, [value])
+    }, [value, xAxis, xAxisData])
 
-    const experimentalPlot = useMemo(() => {
-      const result: ChartData[] = []
+    const experimentalPoints = useMemo(() => {
+      const result: { x: number; y: number; id: string }[][] = []
 
-      experimentalData.forEach(([time, ...values]) => {
+      experimentalData.forEach(([time, ...values], timePoint) => {
         values.forEach((value, index) => {
-          result.push({
-            time,
-            value,
-            component: `Component ${index + 1}`,
-          })
+          if (timePoint === 0) {
+            result.push([])
+          }
+
+          if (time >= xAxisData[xAxis[0]] && time <= xAxisData[xAxis[1] - 1]) {
+            result[index].push({
+              x: time,
+              y: value,
+              id: `Experimental ${index + 1} (${time}, ${value})`,
+            })
+          }
         })
       })
 
       return result
-    }, [experimentalData])
-
-    const config = useMemo<MixConfig>(
-      () => ({
-        type: "view",
-        children: [
-          {
-            type: "line",
-            data: lineData,
-            encode: {
-              x: "time",
-              y: "value",
-              color: "component",
-              shape: "smooth",
-            },
-          },
-          {
-            type: "point",
-            data: calculatedData,
-            encode: {
-              x: "time",
-              y: "value",
-              color: "component",
-            },
-            axis: { y: false },
-            slider: { y: false },
-          },
-          {
-            type: "point",
-            data: experimentalPlot,
-            encode: {
-              x: "time",
-              y: "value",
-              color: "component",
-            },
-            axis: { y: false },
-            slider: { y: false },
-          },
-        ],
-        axis: {
-          x: { title: "Время, сек", size: 40 },
-          y: { title: "Концентрация, моль/л", size: 36 },
-        },
-        slider: {
-          x: { labelFormatter: "~s" },
-          y: { labelFormatter: "~s" },
-        },
-      }),
-      [calculatedData, experimentalPlot, lineData],
-    )
+    }, [experimentalData, xAxis, xAxisData])
 
     return (
-      <Card title="Результат" style={cardStyle}>
-        <Mix {...config} />
-      </Card>
+      <>
+        <Paper variant="outlined">
+          <Stack gap={2} p={2}>
+            <Typography fontWeight={700}>Результат</Typography>
+            <Divider />
+            <Stack direction="row" alignItems="center">
+              <FormGroup sx={{ minWidth: 200 }}>
+                <FormControlLabel
+                  label="All"
+                  control={
+                    <Checkbox
+                      checked={componentsVisibility.every(Boolean)}
+                      indeterminate={
+                        !componentsVisibility.every(Boolean) &&
+                        componentsVisibility.some(Boolean)
+                      }
+                      onChange={(event) => {
+                        const newValue = event.target.checked
+                        setComponentsVisibility(
+                          Array(componentsVisibility.length).fill(newValue),
+                        )
+                      }}
+                    />
+                  }
+                />
+                <Stack overflow="auto" maxHeight={CONTAINER_HEIGHT}>
+                  {components.map((component, index) => (
+                    <FormControlLabel
+                      key={index}
+                      control={
+                        <Checkbox
+                          sx={{
+                            color: cheerfulFiestaPaletteLight[index],
+                            "&.Mui-checked": {
+                              color: cheerfulFiestaPaletteLight[index],
+                            },
+                          }}
+                          checked={componentsVisibility[index]}
+                          onChange={(event) => {
+                            const newValue = event.target.checked
+                            const newComponentVisibility = [
+                              ...componentsVisibility,
+                            ]
+                            newComponentVisibility[index] = newValue
+                            setComponentsVisibility(newComponentVisibility)
+                          }}
+                        />
+                      }
+                      label={component.label}
+                    />
+                  ))}
+                </Stack>
+              </FormGroup>
+              <Stack width="100%">
+                <ResponsiveChartContainer
+                  height={CONTAINER_HEIGHT}
+                  colors={cheerfulFiestaPaletteLight}
+                  series={[
+                    ...(experimentalPoints
+                      .map((values, index) =>
+                        componentsVisibility[index]
+                          ? ({
+                              id: `Experimental ${index + 1}`,
+                              data: values,
+                              type: "scatter",
+                              color: cheerfulFiestaPaletteLight[index],
+                              valueFormatter: ({ y }) =>
+                                `Experimental value: ${y}`,
+                            } as ScatterSeriesType)
+                          : null,
+                      )
+                      .filter(Boolean) as ScatterSeriesType[]),
+                    ...(calculatedPoints
+                      .map((values, index) =>
+                        componentsVisibility[index]
+                          ? ({
+                              id: `Calculated ${index + 1}`,
+                              data: values,
+                              type: "scatter",
+                              color: cheerfulFiestaPaletteLight[index],
+                              valueFormatter: ({ y }) =>
+                                `Calculated value: ${y}`,
+                            } as ScatterSeriesType)
+                          : null,
+                      )
+                      .filter(Boolean) as ScatterSeriesType[]),
+                    ...(lines
+                      .map((values, index) =>
+                        componentsVisibility[index]
+                          ? ({
+                              data: values,
+                              type: "line",
+                              color: cheerfulFiestaPaletteLight[index],
+                            } as LineSeriesType)
+                          : null,
+                      )
+                      .filter(Boolean) as LineSeriesType[]),
+                  ]}
+                  xAxis={[
+                    {
+                      data: xAxisData,
+                      scaleType: "linear",
+                      id: "x-axis-id",
+                    },
+                  ]}
+                >
+                  <LinePlot />
+                  <ScatterPlot />
+                  <ChartsXAxis
+                    label="Время, сек"
+                    position="bottom"
+                    axisId="x-axis-id"
+                  />
+                  <ChartsYAxis label="Концентрация, моль/л" position="left" />
+                  <ChartsLegend direction="row" />
+                  <ChartsTooltip trigger="item" />
+                </ResponsiveChartContainer>
+                <Slider
+                  getAriaLabel={() => "Time"}
+                  value={xAxis}
+                  onChange={(_event, newValue) => {
+                    setXAxis(newValue as number[])
+                  }}
+                  min={0}
+                  max={maxX}
+                />
+              </Stack>
+            </Stack>
+          </Stack>
+        </Paper>
+      </>
     )
   },
 )

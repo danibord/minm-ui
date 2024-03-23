@@ -189,10 +189,12 @@ export function Root() {
               </Button>
             </Grid>
             {!!result && (
-              <ResultSection
-                value={result}
-                experimentalData={fixedExperimentalData}
-              />
+              <Grid item xs={12}>
+                <ResultSection
+                  value={result}
+                  experimentalData={fixedExperimentalData}
+                />
+              </Grid>
             )}
           </Grid>
         </Stack>
