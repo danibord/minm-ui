@@ -6,7 +6,7 @@ import {
   Table,
 } from "../../components"
 import { useState } from "react"
-import { MOCK_DATA, urls } from "../../const"
+import { MOCK_DATA, URL_BY_MODULE } from "../../const"
 import axios from "axios"
 import {
   CalculationResult,
@@ -85,7 +85,7 @@ export function Root() {
     setLoading(true)
     try {
       const { data } = await axios.post<CalculationResult>(
-        urls.solveKinetics,
+        URL_BY_MODULE[module],
         requestData,
       )
       setResult(data)
