@@ -1,3 +1,5 @@
+import { ComponentType } from "react"
+
 export interface TableParams {
   components: number
   stages: number
@@ -36,9 +38,21 @@ export interface CommonParams {
 
 export enum MODULE {
   NONE = "none",
+  EXAMPLE = "example",
 }
 
-export type RequestData = TableSectionData & CommonParams
+export interface ModuleData {
+  [field: string]: unknown
+}
+
+export type ModuleComponent<Data extends ModuleData = ModuleData> =
+  ComponentType<{
+    value: Data
+    onChange: (value: Partial<Data>) => void
+  }>
+
+export type RequestData = TableSectionData &
+  CommonParams & { module_data?: ModuleData }
 
 export interface CalculationResult {
   calculation_time: number

@@ -4,10 +4,12 @@ const rootUrl = "http://localhost:8000/api/v1"
 
 export const urls = {
   solveKinetics: `${rootUrl}/reaction_kinetics_solver`,
+  example: `${rootUrl}/example`,
 }
 
 export const URL_BY_MODULE = {
   [MODULE.NONE]: urls.solveKinetics,
+  [MODULE.EXAMPLE]: urls.example,
 }
 
 export const MOCK_DATA = {

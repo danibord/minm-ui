@@ -1,5 +1,9 @@
-import { MODULE } from "../../types"
-import { moduleOptions } from "./const"
+import { MODULE, ModuleComponent, ModuleData } from "../../types"
+import {
+  COMPONENT_BY_MODULE,
+  DEFAULT_VALUE_BY_MODULE,
+  moduleOptions,
+} from "./const"
 import {
   Divider,
   FormControl,
@@ -13,11 +17,22 @@ import {
 interface ModuleSectionProps {
   module: MODULE
   onModuleChange: (newModule: MODULE) => void
-  moduleData: unknown
-  onModuleDataChange: (newData: unknown) => void
+  moduleData: ModuleData | null
+  onModuleDataChange: (newData: ModuleData | null) => void
 }
 
-export function ModuleSection({ module, onModuleChange }: ModuleSectionProps) {
+export function ModuleSection({
+  module,
+  onModuleChange,
+  moduleData,
+  onModuleDataChange,
+}: ModuleSectionProps) {
+  const Component = COMPONENT_BY_MODULE[module] as ModuleComponent | null
+
+  const handleModuleDataChange = (newParams: Partial<ModuleData>) => {
+    onModuleDataChange({ ...moduleData, ...newParams })
+  }
+
   return (
     <Paper variant="outlined">
       <Stack p={2} gap={2} height="100%">
@@ -26,9 +41,11 @@ export function ModuleSection({ module, onModuleChange }: ModuleSectionProps) {
           <Select
             labelId="module-label"
             value={module}
-            onChange={(event) => {
+            onChange={(event, option) => {
+              console.log({ option })
               const newValue = event.target.value as MODULE
               onModuleChange(newValue)
+              onModuleDataChange(DEFAULT_VALUE_BY_MODULE[newValue])
             }}
             label="Расчетный модуль"
           >
@@ -40,6 +57,9 @@ export function ModuleSection({ module, onModuleChange }: ModuleSectionProps) {
           </Select>
         </FormControl>
         <Divider />
+        {!!(Component && moduleData) && (
+          <Component value={moduleData} onChange={handleModuleDataChange} />
+        )}
       </Stack>
     </Paper>
   )

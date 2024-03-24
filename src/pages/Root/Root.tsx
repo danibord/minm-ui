@@ -15,6 +15,7 @@ import {
   RequestData,
   TableParams,
   METHOD,
+  ModuleData,
 } from "../../types"
 import {
   Box,
@@ -34,7 +35,7 @@ export function Root() {
   const [loading, setLoading] = useState(false)
 
   const [module, setModule] = useState<MODULE>(MODULE.NONE)
-  const [moduleData, setModuleData] = useState<unknown>()
+  const [moduleData, setModuleData] = useState<ModuleData | null>(null)
 
   const [tableParams, setTableParams] = useState<TableParams>({
     components: 5,
@@ -170,6 +171,7 @@ export function Root() {
                     exponents_of_substances_matrix,
                     reaction_rate_constants,
                     experimental_data_matrix,
+                    ...(!!moduleData && { module_data: moduleData }),
                   })
                 }}
                 disabled={loading}
